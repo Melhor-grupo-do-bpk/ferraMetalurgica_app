@@ -43,3 +43,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Code generation (freezed / json_serializable / riverpod_generator)
+# Regenerate locally with: dart run build_runner build --delete-conflicting-outputs
+*.g.dart
+*.freezed.dart
+
+# FVM
+.fvm/

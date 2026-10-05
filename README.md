@@ -1,73 +1,111 @@
-# App de Gestao - Fera Metalurgica
+# FERA
 
-> Projeto em desenvolvimento. Nome do aplicativo ainda nao definido.
+App de gestão de orçamentos para uma empresa de estruturas metálicas
+(portões basculantes, estruturas treliçadas, grades de proteção). Permite
+montar, calcular e enviar orçamentos B2B, com catálogo de produtos e
+cronograma de tarefas.
 
-Aplicativo mobile desenvolvido em Flutter/Dart para a Fera Metalurgica, com foco em tres frentes principais: gerenciamento de orcamentos, catalogo de produtos e agendamento de compromissos.
+- **Plataformas:** Android e iOS.
+- **Persistência:** local, em arquivos JSON (sem backend por enquanto —
+  trocável por API depois sem mudar as camadas `domain`/`presentation`).
 
-## Sobre o projeto
+O projeto Flutter fica em [`fera_metalurgica_app/`](fera_metalurgica_app/).
+As regras de estrutura e convenções para quem (ou qual IA) for editar este
+repositório estão em [`CLAUDE.md`](CLAUDE.md) (espelhado em `.cursorrules`).
 
-Este repositorio contem o versionamento do aplicativo, criado para atender as necessidades operacionais da Fera Metalurgica no que diz respeito ao controle de orcamentos gerados para clientes, a organizacao do catalogo de produtos oferecidos pela empresa e ao agendamento de compromissos relacionados ao atendimento.
+## Pré-requisitos
 
-## Funcionalidades
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) 3.47.1 (versão
+  fixada em [`fera_metalurgica_app/.fvmrc`](fera_metalurgica_app/.fvmrc)).
+  Recomendado usar o [FVM](https://fvm.app/) para garantir que todo o time
+  use exatamente essa versão:
+  ```bash
+  dart pub global activate fvm
+  cd fera_metalurgica_app
+  fvm install
+  fvm use
+  # depois disso, rode os comandos abaixo com "fvm flutter" / "fvm dart"
+  ```
+- No Windows, o Modo de Desenvolvedor precisa estar ativado para builds com
+  plugins (symlinks): `start ms-settings:developers`.
 
-### Gerenciamento de orcamentos
-- Criacao, edicao e acompanhamento de orcamentos
-- Vinculacao de produtos do catalogo aos orcamentos
-
-### Catalogo de produtos
-- Cadastro e organizacao dos produtos oferecidos
-- Consulta rapida durante a montagem de orcamentos
-
-### Agendamento de compromissos
-- Marcacao de compromissos e visitas relacionados aos atendimentos
-- Visualizacao de agenda
-
-As funcionalidades acima estao sujeitas a ajustes conforme o levantamento de requisitos avanca.
-
-## Tecnologias
-
-- Flutter
-- Dart
-
-## Estrutura do projeto
-
-```
-lib/
-├── main.dart
-├── models/
-├── screens/
-├── widgets/
-├── services/
-└── utils/
-```
-
-Estrutura sujeita a alteracoes conforme a evolucao do projeto.
-
-## Como executar
+## Como rodar
 
 ```bash
-# Clone o repositorio
-git clone <url-do-repositorio>
-
-# Acesse a pasta do projeto
-cd <nome-do-projeto>
-
-# Instale as dependencias
+cd fera_metalurgica_app
 flutter pub get
-
-# Execute o aplicativo
+dart run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-## Pre-requisitos
+## Geração de código (build_runner)
 
-- Flutter SDK instalado (https://docs.flutter.dev/get-started/install)
-- Emulador Android/iOS configurado ou dispositivo fisico conectado
+O projeto usa `freezed`, `json_serializable` e `riverpod_generator`. Os
+arquivos gerados (`*.g.dart`, `*.freezed.dart`) **não são versionados** —
+gere-os localmente sempre que der `pub get` ou alterar um model `@freezed`
+ou um provider `@riverpod`:
 
-## Status do projeto
+```bash
+# gera uma vez
+dart run build_runner build --delete-conflicting-outputs
 
-Em desenvolvimento.
+# gera continuamente enquanto você edita
+dart run build_runner watch --delete-conflicting-outputs
+```
 
-## Cliente
+## Como rodar os testes
 
-Aplicativo desenvolvido sob demanda para Fera Metalurgica.
+```bash
+flutter test
+```
+
+Ver [`fera_metalurgica_app/test/README.md`](fera_metalurgica_app/test/README.md)
+para a convenção de testes (`unit/`, `widget/`, `mocks/`).
+
+## Lint / análise estática
+
+O projeto usa [`very_good_analysis`](https://pub.dev/packages/very_good_analysis).
+O CI (`.github/workflows/analyze.yml`) roda `flutter analyze --fatal-infos`
+em todo Pull Request — nenhum erro ou aviso de lint pode ficar sem correção.
+
+## Estrutura de pastas
+
+```
+fera_metalurgica_app/
+  lib/
+    core/            # infraestrutura compartilhada
+      di/            # providers riverpod compartilhados (ex: LocalJsonStorage)
+      router/        # AppRouter (go_router) — rota central do app
+      theme/         # AppTheme
+      utils/         # utilitários genéricos
+      constants/     # constantes globais
+    features/
+      dashboard/     # tela inicial com indicadores e recentes
+      orcamentos/     # CRUD + wizard de orçamentos
+      catalogo/       # catálogo de produtos/estruturas
+      cronograma/     # calendário e tarefas
+  test/
+    unit/    widget/    mocks/
+```
+
+Cada feature segue `data/` (implementações/I-O) + `domain/` (models freezed
++ contratos de repositório) + `presentation/` (telas/widgets) + um arquivo
+barrel `<feature>.dart` com a API pública da feature.
+
+## Features
+
+- **dashboard** — tela inicial com indicadores (orçamentos em andamento,
+  aguardando resposta, aprovados, pendentes) e lista de orçamentos recentes.
+- **orcamentos** — CRUD de orçamentos e wizard de criação em 4 etapas
+  (1. dados do cliente, 2. itens/medidas/material, 3. custos operacionais,
+  4. resumo com valor final calculado), detalhes do orçamento, geração/prévia
+  de PDF e envio via WhatsApp.
+- **catalogo** — catálogo de produtos/estruturas (foto, categoria, descrição
+  técnica).
+- **cronograma** — calendário e lista de tarefas do dia, filtráveis por tipo
+  (orçamentos/visitas).
+
+> Este commit contém apenas a estrutura base do projeto (pastas, stack,
+> lint, CI, modelos de domínio e uma tela Home mínima) — a lógica de negócio
+> completa de cada feature (wizard, PDF, WhatsApp, etc.) ainda será
+> implementada.
