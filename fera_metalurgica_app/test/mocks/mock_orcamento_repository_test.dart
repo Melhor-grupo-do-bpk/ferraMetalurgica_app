@@ -11,7 +11,13 @@ void main() {
       final repository = MockOrcamentoRepository();
       final orcamento = Orcamento(
         id: '1',
-        cliente: const Cliente(id: 'c1', nome: 'Cliente Teste', telefone: ''),
+        cliente: const Cliente(
+          id: 'c1',
+          nome: 'Cliente Teste',
+          numero: '',
+          cpfCnpj: '',
+        ),
+        projeto: 'Projeto Teste',
         itens: const [],
         custosOperacionais: const CustosOperacionais(),
         status: StatusOrcamento.emAnalise,

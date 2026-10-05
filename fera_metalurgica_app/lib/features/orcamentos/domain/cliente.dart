@@ -14,14 +14,17 @@ abstract class Cliente with _$Cliente {
     /// Nome do cliente ou da empresa contratante.
     required String nome,
 
-    /// Telefone de contato do cliente.
-    required String telefone,
+    /// Número de telefone/WhatsApp do cliente.
+    required String numero,
+
+    /// CPF ou CNPJ do cliente.
+    required String cpfCnpj,
 
     /// E-mail de contato do cliente, quando informado.
     String? email,
 
-    /// Endereço do cliente/obra, quando informado.
-    String? endereco,
+    /// Observações adicionais sobre o cliente.
+    String? observacoes,
   }) = _Cliente;
 
   /// Cria um [Cliente] a partir de um mapa JSON.

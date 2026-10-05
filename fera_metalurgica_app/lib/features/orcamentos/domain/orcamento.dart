@@ -23,6 +23,9 @@ abstract class Orcamento with _$Orcamento {
     /// Cliente para quem o orçamento é feito (etapa 1 do wizard).
     required Cliente cliente,
 
+    /// Nome do projeto (ex: "Portão metálico").
+    required String projeto,
+
     /// Itens de serviço/material/medida do orçamento (etapa 2 do wizard).
     required List<ItemOrcamento> itens,
 
@@ -34,6 +37,10 @@ abstract class Orcamento with _$Orcamento {
 
     /// Data de criação do orçamento.
     required DateTime criadoEm,
+
+    // TODO(cliente): nenhuma etapa pede esse dado.
+    /// Prazo estimado de entrega, em dias úteis após aprovação e sinal.
+    @Default(15) int prazoDiasUteis,
   }) = _Orcamento;
 
   const Orcamento._();

@@ -1,3 +1,4 @@
+import 'package:fera_metalurgica_app/features/orcamentos/domain/medidas.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'item_orcamento.freezed.dart';
@@ -17,11 +18,20 @@ abstract class ItemOrcamento with _$ItemOrcamento {
     /// Identificador único do item.
     required String id,
 
-    /// Descrição do item (ex: "Portão basculante 3x2,5m").
-    required String descricao,
+    /// Tipo do serviço (ex: "Portão metálico basculante").
+    required String tipoServico,
 
-    /// Quantidade do item.
-    required double quantidade,
+    /// Medidas do item, em metros.
+    @Default(Medidas()) Medidas medidas,
+
+    /// Material principal (ex: "Aço Carbono").
+    String? materialPrincipal,
+
+    /// Especificações técnicas / observações (acabamento, pintura etc.).
+    String? especificacoes,
+
+    /// Quantidade de unidades do item.
+    @Default(1) int quantidade,
 
     /// Identificador do produto do catálogo de origem, quando houver.
     String? produtoId,

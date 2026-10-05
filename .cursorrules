@@ -90,33 +90,55 @@ uma feature existente, pare e pergunte antes de criar uma categoria nova.
 
 ## Domínio do negócio — não invente campos fora disso
 
-Um **Orçamento** (`lib/features/orcamentos/domain/orcamento.dart`) é sempre a
-composição de exatamente estas quatro partes (que também são as 4 etapas do
-wizard de criação):
+Modelo final de dados (todos `freezed` + `json_serializable`; `?` = opcional,
+`= x` = valor padrão). Campos fora desta lista exigem alinhamento antes.
 
-1. **Cliente** (`Cliente`) — dados do cliente (nome, telefone, email,
-   endereço).
-2. **Itens** (`List<ItemOrcamento>`) — serviços/materiais/medidas, cada um
-   com descrição e quantidade (descritivos: não entram no valor final). Pode
-   referenciar um `ProdutoCatalogo`.
-3. **Custos operacionais** (`CustosOperacionais`) — matéria-prima, mão de
-   obra, insumos, combustível, impostos.
-4. **Valor final** — **não é um campo digitado**. É sempre calculado
-   (getter `Orcamento.valorFinal`) como
-   `calcularValorFinal(calcularTotalCustos(custos), margem)`, funções puras
-   em `orcamentos/domain/calculo_orcamento.dart`, com a margem padrão em
-   `AppConstants.margemPadraoPercentual` (provisória: 62,5%). Se a lógica de
-   cálculo mudar, mude essas funções — não adicione um campo `valorFinal`
-   gravável no freezed.
+### Orçamentos (`lib/features/orcamentos/domain/`)
 
-Um orçamento também tem `status` (`StatusOrcamento`: `emAnalise`, `enviado`,
-`aprovado`, `recusado` — não adicione outros status sem alinhar com o time).
+Um **Orçamento** é sempre a composição de cliente + itens + custos
+operacionais, que são as etapas 1 a 3 do wizard; a etapa 4 é o resumo.
 
-Um **ProdutoCatalogo** tem `nome`, `categoria`, `descricaoTecnica` e
-opcionalmente uma foto (`fotoPath`).
+- **`Orcamento`** — `id` (exibido como "#00482"), `cliente` (`Cliente`),
+  `projeto` (nome do projeto), `itens` (`List<ItemOrcamento>`),
+  `custosOperacionais` (`CustosOperacionais`), `status`
+  (`StatusOrcamento`), `criadoEm` (`DateTime`), `prazoDiasUteis` (`int = 15`;
+  provisório, nenhuma etapa do wizard pede esse dado).
+- **`Cliente`** (etapa 1) — `id`, `nome`, `numero` (telefone/WhatsApp),
+  `cpfCnpj`, `email?`, `observacoes?`.
+- **`ItemOrcamento`** (etapa 2) — `id`, `tipoServico`, `medidas`
+  (`Medidas = Medidas()`), `materialPrincipal?`, `especificacoes?`,
+  `quantidade` (`int = 1`), `produtoId?` (referência a um
+  `ProdutoCatalogo`). Itens são descritivos: **não têm valor unitário** e não
+  entram no valor final.
+- **`Medidas`** — `altura?`, `largura?`, `comprimento?` (A, L, C, em metros).
+- **`CustosOperacionais`** (etapa 3) — `materiaPrima`, `maoDeObra`,
+  `insumos`, `combustivel`, `impostos` (todos `double = 0`).
+- **`StatusOrcamento`** — `emAnalise`, `enviado`, `aprovado`, `recusado`. Não
+  adicione outros status sem alinhar com o time.
 
-Uma **Tarefa** do cronograma tem `titulo`, `data`, `tipo` (`TipoTarefa`:
-`orcamento`, `producao` ou `visita`) e `concluida`.
+**Valor final** — **não é um campo digitado**. É sempre calculado:
+
+```
+valorFinal = custos × (1 + margem)
+```
+
+ou seja, getter `Orcamento.valorFinal` =
+`calcularValorFinal(calcularTotalCustos(custosOperacionais), margem)`, com as
+funções puras em `orcamentos/domain/calculo_orcamento.dart` e a margem padrão
+em `AppConstants.margemPadraoPercentual` (provisória: 62,5%, que leva
+R$ 5.200 a R$ 8.450). Se a lógica mudar, mude essas funções — nunca adicione um
+campo `valorFinal` gravável no freezed.
+
+### Catálogo (`lib/features/catalogo/domain/`)
+
+- **`ProdutoCatalogo`** — `id`, `nome`, `categoria`, `descricaoTecnica`,
+  `fotoPath?`.
+
+### Cronograma (`lib/features/cronograma/domain/`)
+
+- **`Tarefa`** — `id`, `titulo`, `data` (`DateTime`), `tipo` (`TipoTarefa`),
+  `concluida` (`bool = false`).
+- **`TipoTarefa`** — `orcamento`, `producao`, `visita`.
 
 Não invente campos, entidades ou relações fora do que está descrito aqui sem
 perguntar antes.

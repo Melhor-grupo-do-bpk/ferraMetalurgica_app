@@ -9,6 +9,7 @@ export 'domain/calculo_orcamento.dart';
 export 'domain/cliente.dart';
 export 'domain/custos_operacionais.dart';
 export 'domain/item_orcamento.dart';
+export 'domain/medidas.dart';
 export 'domain/orcamento.dart';
 export 'domain/orcamento_repository.dart';
 export 'domain/status_orcamento.dart';
