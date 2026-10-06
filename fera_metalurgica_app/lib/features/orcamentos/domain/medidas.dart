@@ -19,7 +19,17 @@ abstract class Medidas with _$Medidas {
     double? comprimento,
   }) = _Medidas;
 
+  const Medidas._();
+
   /// Cria um [Medidas] a partir de um mapa JSON.
   factory Medidas.fromJson(Map<String, dynamic> json) =>
       _$MedidasFromJson(json);
+
+  /// Medidas preenchidas, na ordem A x L x C (ex: `"2.50m x 2.20m"`), ou
+  /// string vazia quando nenhuma foi informada.
+  String get formatada => [
+    altura,
+    largura,
+    comprimento,
+  ].whereType<double>().map((m) => '${m.toStringAsFixed(2)}m').join(' x ');
 }

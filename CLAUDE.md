@@ -111,10 +111,19 @@ operacionais, que são as etapas 1 a 3 do wizard; a etapa 4 é o resumo.
   `ProdutoCatalogo`). Itens são descritivos: **não têm valor unitário** e não
   entram no valor final.
 - **`Medidas`** — `altura?`, `largura?`, `comprimento?` (A, L, C, em metros).
+  Para exibir, use o getter `Medidas.formatada` (só as preenchidas, ordem
+  A x L x C, ex: "2.50m x 2.20m"; vazio se nenhuma).
 - **`CustosOperacionais`** (etapa 3) — `materiaPrima`, `maoDeObra`,
   `insumos`, `combustivel`, `impostos` (todos `double = 0`).
-- **`StatusOrcamento`** — `emAnalise`, `enviado`, `aprovado`, `recusado`. Não
-  adicione outros status sem alinhar com o time.
+- **`StatusOrcamento`** — `rascunho`, `emAnalise`, `enviado`, `aprovado`,
+  `recusado`. Não adicione outros status sem alinhar com o time. É
+  serializado pelo **nome** (`"emAnalise"`), nunca pelo índice — não renomeie
+  valores existentes sem migrar os dados salvos. Regras do `rascunho`:
+  - os cards (indicadores) do dashboard **ignoram** orçamentos em rascunho;
+  - a lista de orçamentos mostra o chip "Rascunho";
+  - por enquanto o wizard só grava `emAnalise` ao concluir; salvar como
+    rascunho fica para quando o cliente confirmar (`// TODO(cliente)` em
+    `status_orcamento.dart`).
 
 **Valor final** — **não é um campo digitado**. É sempre calculado:
 

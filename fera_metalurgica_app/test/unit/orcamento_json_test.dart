@@ -33,6 +33,20 @@ void main() {
     expect(item.especificacoes, isNull);
   });
 
+  test('status é serializado pelo nome, não pelo índice', () {
+    final original = orcamentosSeed.first.copyWith(
+      status: StatusOrcamento.rascunho,
+    );
+
+    final json = jsonDecode(jsonEncode(original)) as Map<String, dynamic>;
+    expect(json['status'], 'rascunho');
+    expect(Orcamento.fromJson(json).status, StatusOrcamento.rascunho);
+
+    // JSON gravado antes de existir `rascunho` continua lendo o mesmo status.
+    final antigo = {...json, 'status': 'aprovado'};
+    expect(Orcamento.fromJson(antigo).status, StatusOrcamento.aprovado);
+  });
+
   test('ida e volta JSON preserva medidas, material e especificações', () {
     final original = orcamentosSeed.firstWhere((o) => o.id == '00482');
 
